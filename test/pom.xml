@@ -9,11 +9,26 @@
         <version>1</version>
     </parent>
 
-    <artifactId>core</artifactId>
+    <artifactId>test</artifactId>
     <dependencies>
+        <dependency>
+            <groupId>ru.melnik</groupId>
+            <artifactId>core</artifactId>
+            <version>1</version>
+        </dependency>
+        <!-- Scala dependencies -->
         <dependency>
             <groupId>org.scalactic</groupId>
             <artifactId>scalactic_${scala.binary.version}</artifactId>
+            <version>${scalactic.version}</version>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.binary.version}</artifactId>
+            <version>${scalatest.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

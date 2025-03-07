@@ -13,6 +13,7 @@
         <module>api</module>
         <module>core</module>
         <module>infrastructure</module>
+        <module>test</module>
     </modules>
 
     <properties>
@@ -25,22 +26,24 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies>
-        <!-- Scala dependencies -->
-        <dependency>
-            <groupId>org.scalactic</groupId>
-            <artifactId>scalactic_${scala.binary.version}</artifactId>
-            <version>${scalactic.version}</version>
-        </dependency>
+    <dependencyManagement>
+        <dependencies>
+            <!-- Scala dependencies -->
+            <dependency>
+                <groupId>org.scalactic</groupId>
+                <artifactId>scalactic_${scala.binary.version}</artifactId>
+                <version>${scalactic.version}</version>
+            </dependency>
 
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.binary.version}</artifactId>
-            <version>${scalatest.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+            <!-- Test dependencies -->
+            <dependency>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest_${scala.binary.version}</artifactId>
+                <version>${scalatest.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <finalName>delivery</finalName>
