@@ -26,24 +26,22 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <!-- Scala dependencies -->
-            <dependency>
-                <groupId>org.scalactic</groupId>
-                <artifactId>scalactic_${scala.binary.version}</artifactId>
-                <version>${scalactic.version}</version>
-            </dependency>
+    <dependencies>
+        <!-- Scala dependencies -->
+        <dependency>
+            <groupId>org.scalactic</groupId>
+            <artifactId>scalactic_${scala.binary.version}</artifactId>
+            <version>${scalactic.version}</version>
+        </dependency>
 
-            <!-- Test dependencies -->
-            <dependency>
-                <groupId>org.scalatest</groupId>
-                <artifactId>scalatest_${scala.binary.version}</artifactId>
-                <version>${scalatest.version}</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.binary.version}</artifactId>
+            <version>${scalatest.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <finalName>delivery</finalName>

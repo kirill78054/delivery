@@ -10,10 +10,4 @@
     </parent>
 
     <artifactId>core</artifactId>
-    <dependencies>
-        <dependency>
-            <groupId>org.scalactic</groupId>
-            <artifactId>scalactic_${scala.binary.version}</artifactId>
-        </dependency>
-    </dependencies>
 </project>
