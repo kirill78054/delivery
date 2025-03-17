@@ -18,9 +18,8 @@ class LocationTest extends AnyWordSpec with Matchers {
     }
 
     "first not shouldBe second" in {
-      val first = Location(1, 1)
       val second = Location(1, 2)
-      first should not equal second
+      Location.minLocation should not equal second
     }
 
     s"x less ${Location.MIN}" in {
