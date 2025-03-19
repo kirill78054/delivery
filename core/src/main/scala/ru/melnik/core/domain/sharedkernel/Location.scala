@@ -15,6 +15,8 @@ object Location {
   val MIN: Int = 1
   val MAX: Int = 10
 
+  val minLocation: Location = Location(1, 1)
+
   def createRandom(): Location = {
     def createRandomInt(): Int = MIN + Random.nextInt(MAX - MIN + 1)
 

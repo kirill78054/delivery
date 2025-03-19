@@ -1,8 +1,7 @@
-package ru.melnik.core.domain.model
+package ru.melnik.core.domain.model.courieraggregate
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import ru.melnik.core.domain.model.courieraggregate.Transport
 import ru.melnik.core.domain.model.courieraggregate.Transport.{SPEED_MAX, SPEED_MIN}
 import ru.melnik.core.domain.sharedkernel.Location
 
@@ -69,10 +68,9 @@ class TransportTest extends AnyWordSpec with Matchers {
 
     "Transport move to finish" in {
       val transport = Transport("Car", 3)
-      val start = Location(1, 1)
       val finish = Location(5, 5)
 
-      val location1 = transport.move(start -> finish)
+      val location1 = transport.move(Location.minLocation -> finish)
       val location2 = transport.move(location1 -> finish)
       val location3 = transport.move(location2 -> finish)
 
