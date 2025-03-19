@@ -32,6 +32,22 @@ class Courier private(
     this.location.distanceTo(target).doubleValue() / transport.speed
   }
 
+  private def canEqual(other: Any): Boolean = other.isInstanceOf[Courier]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: Courier =>
+      that.canEqual(this) &&
+        id == that.id
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(id)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
+
+
+  override def toString = s"Courier($id, $name, $transport, $location, $courierStatus)"
 }
 
 object Courier {
