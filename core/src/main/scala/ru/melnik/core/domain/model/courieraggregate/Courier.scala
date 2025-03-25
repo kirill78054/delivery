@@ -82,4 +82,17 @@ object Courier {
     )
   }
 
+  def fromDb(id: UUID,
+             name: String,
+             transport: Transport,
+             location: Location,
+             courierStatus: CourierStatus): Courier =
+    Courier(
+      id = id,
+      name = name,
+      transport = transport,
+      location = location,
+      courierStatus = courierStatus
+    )
+
 }

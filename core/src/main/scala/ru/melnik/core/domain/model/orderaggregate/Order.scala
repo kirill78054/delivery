@@ -23,6 +23,19 @@ class Order private(val id: UUID, val location: Location, var status: OrderStatu
     this.status = Completed
   }
 
+  private def canEqual(other: Any): Boolean = other.isInstanceOf[Order]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: Order =>
+      that.canEqual(this) &&
+        id == that.id
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(id)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
 }
 
 object Order {
@@ -35,6 +48,10 @@ object Order {
     require(status != null, "status is null")
     require(courierId != null, "courierId is null")
     new Order(id, location, status, courierId)
+  }
+
+  def fromDb(id: UUID, location: Location, status: OrderStatus, courierId: Option[UUID]): Order = {
+    Order(id, location, status, courierId)
   }
 
 }

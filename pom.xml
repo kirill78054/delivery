@@ -21,6 +21,8 @@
         <scala.version>2.12.17</scala.version>
         <scala.binary.version>2.12</scala.binary.version>
         <scalactic.version>3.2.17</scalactic.version>
+        <pg.version>42.2.1</pg.version>
+        <doobie.version>1.0.0-RC8</doobie.version>
         <scalatest.version>3.2.17</scalatest.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,6 +34,16 @@
             <groupId>org.scalactic</groupId>
             <artifactId>scalactic_${scala.binary.version}</artifactId>
             <version>${scalactic.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.tpolecat</groupId>
+            <artifactId>doobie-postgres_2.12</artifactId>
+            <version>${doobie.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${pg.version}</version>
         </dependency>
 
         <!-- Test dependencies -->
@@ -50,7 +62,6 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
-
         <plugins>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
