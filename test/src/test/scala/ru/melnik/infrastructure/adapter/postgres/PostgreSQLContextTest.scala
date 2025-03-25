@@ -10,34 +10,50 @@ import doobie.util.update.Update0
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.testcontainers.containers.PostgreSQLContainer
 import ru.melnik.infrastructure.adapter.postgres.PostgreSQLContextTest.execFileScript
 
 import scala.io.Source
 
 class PostgreSQLContextTest extends AnyWordSpec with Matchers with BeforeAndAfterEach {
-  protected var tr: Aux[IO, Unit] = _
-
-  private val printSqlLogHandler: LogHandler[IO] = (logEvent: LogEvent) => IO {
-    println(logEvent.sql)
+  private val postgreSQLContainer = {
+    val postgreSQLContainer = new PostgreSQLContainer("postgres:latest")
+    postgreSQLContainer.withDatabaseName("delivery")
+    postgreSQLContainer.withUsername("mel")
+    postgreSQLContainer.withPassword("mel")
+    postgreSQLContainer
   }
 
   override protected def beforeEach(): Unit = {
-    Class.forName("org.postgresql.Driver")
-    tr = Transactor.fromDriverManager[IO].apply(
-      driver = "org.postgresql.Driver",
-      url = "jdbc:postgresql://0.0.0.0:5432/delivery",
-      user = "mel",
-      password = "mel",
-      logHandler = Some(printSqlLogHandler)
-    )
-
-    dropTables()
-    execFileScript("init_tables.sql", tr)
+    postgreSQLContainer.start()
+    withTransaction(tr => {
+      dropTables(tr)
+      execFileScript("init_tables.sql", tr)
+    })
   }
 
-  override protected def afterEach(): Unit = dropTables()
+  def withTransaction(f: Aux[IO, Unit] => Unit): Unit = {
+    val printSqlLogHandler: LogHandler[IO] = (logEvent: LogEvent) => IO {
+      println(logEvent.sql)
+    }
 
-  def dropTables(): Unit = execFileScript("drop_tables.sql", tr)
+    Class.forName("org.postgresql.Driver")
+    val tr = Transactor.fromDriverManager[IO].apply(
+      driver = "org.postgresql.Driver",
+      url = postgreSQLContainer.getJdbcUrl,
+      user = postgreSQLContainer.getUsername,
+      password = postgreSQLContainer.getPassword,
+      logHandler = Some(printSqlLogHandler)
+    )
+    f(tr)
+  }
+
+  override protected def afterEach(): Unit = {
+    withTransaction(dropTables)
+    postgreSQLContainer.stop()
+  }
+
+  def dropTables(tr: Aux[IO, Unit]): Unit = execFileScript("drop_tables.sql", tr)
 }
 
 object PostgreSQLContextTest {
