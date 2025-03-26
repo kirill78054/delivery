@@ -8,13 +8,15 @@ import ru.melnik.core.domain.sharedkernel.Location
 
 import java.util.UUID
 
-class ICourierRepositoryTest extends PostgreSQLContextTest {
+class CourierRepositoryTest extends PostgreSQLContextTest {
 
   "addCourier" in {
     withTransaction(tr => {
-      val repository = new ICourierRepository(tr)
+      val work = new UnitOfWork(tr)
+      val repository = new CourierRepository(work, tr)
       val courier = Courier("Kirill", "Car", 2, Location.minLocation)
       repository.addCourier(courier)
+      work.apply()
 
       val maybeCourier = sql"SELECT id, name, transport_id, location_x, location_y, courier_status FROM delivery_courier where id = ${courier.id}"
         .query[(UUID, String, UUID, Int, Int, String)]
@@ -37,12 +39,15 @@ class ICourierRepositoryTest extends PostgreSQLContextTest {
 
   "updateCourier" in {
     withTransaction(tr => {
-      val repository = new ICourierRepository(tr)
+      val work = new UnitOfWork(tr)
+      val repository = new CourierRepository(work, tr)
       val courier = Courier("Kirill", "Car", 2, Location.minLocation)
       repository.addCourier(courier)
+      work.apply()
       courier.setBusy()
       courier.move(Location(5, 5))
       repository.updateCourier(courier)
+      work.apply()
 
       val maybeCourier = sql"SELECT id, name, transport_id, location_x, location_y, courier_status FROM delivery_courier where id = ${courier.id}"
         .query[(UUID, String, UUID, Int, Int, String)]
@@ -65,9 +70,11 @@ class ICourierRepositoryTest extends PostgreSQLContextTest {
 
   "findCourier" in {
     withTransaction(tr => {
-      val repository = new ICourierRepository(tr)
+      val work = new UnitOfWork(tr)
+      val repository = new CourierRepository(work, tr)
       val courier = Courier("Kirill", "Car", 2, Location.minLocation)
       repository.addCourier(courier)
+      work.apply()
 
       val maybeCourier = repository.findCourierById(courier.id)
       maybeCourier.transport shouldBe courier.transport
@@ -78,11 +85,13 @@ class ICourierRepositoryTest extends PostgreSQLContextTest {
 
   "findAllFreeCourier" in {
     withTransaction(tr => {
-      val repository = new ICourierRepository(tr)
+      val work = new UnitOfWork(tr)
+      val repository = new CourierRepository(work, tr)
       val courier1 = Courier("Kirill", "Car", 2, Location.minLocation)
       val courier2 = Courier("Andrey", "Food", 1, Location.minLocation)
       repository.addCourier(courier1)
       repository.addCourier(courier2)
+      work.apply()
 
       val maybeCourier = repository.findAllFreeCourier()
 

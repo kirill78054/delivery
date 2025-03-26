@@ -9,13 +9,15 @@ import ru.melnik.core.domain.sharedkernel.Location
 
 import java.util.UUID
 
-class IOrderRepositoryTest extends PostgreSQLContextTest {
+class OrderRepositoryTest extends PostgreSQLContextTest {
 
   "addOrder" in {
     withTransaction(tr => {
-      val repository = new IOrderRepository(tr)
+      val work = new UnitOfWork(tr)
+      val repository = new OrderRepository(work, tr)
       val order = Order(UUID.randomUUID(), Location.minLocation)
       repository.addOrder(order)
+      work.apply()
 
       val maybeOrder = sql"SELECT id,location_x,location_y,order_status, courier_id FROM delivery_order where id = ${order.id}"
         .query[(UUID, Int, Int, String, Option[UUID])]
@@ -30,13 +32,16 @@ class IOrderRepositoryTest extends PostgreSQLContextTest {
 
   "updateOrder" in {
     withTransaction(tr => {
-      val repository = new IOrderRepository(tr)
+      val work = new UnitOfWork(tr)
+      val repository = new OrderRepository(work, tr)
       val order = Order(UUID.randomUUID(), Location.minLocation)
       repository.addOrder(order)
+      work.apply()
       val courier = Courier("Kirill", "Car", 2, Location.minLocation)
       order.assignCourier(courier)
 
       repository.updateOrder(order)
+      work.apply()
 
       val maybeOrder = sql"SELECT id,location_x,location_y,order_status, courier_id FROM delivery_order where id = ${order.id}"
         .query[(UUID, Int, Int, String, Option[UUID])]
@@ -51,9 +56,11 @@ class IOrderRepositoryTest extends PostgreSQLContextTest {
 
   "findOrderById" in {
     withTransaction(tr => {
-      val repository = new IOrderRepository(tr)
+      val work = new UnitOfWork(tr)
+      val repository = new OrderRepository(work, tr)
       val order = Order(UUID.randomUUID(), Location.minLocation)
       repository.addOrder(order)
+      work.apply()
 
       val maybeOrder = repository.findOrderById(order.id)
       order.id shouldBe maybeOrder.id
@@ -66,11 +73,13 @@ class IOrderRepositoryTest extends PostgreSQLContextTest {
 
   "findRandomCreatedOrder" in {
     withTransaction(tr => {
-      val repository = new IOrderRepository(tr)
+      val work = new UnitOfWork(tr)
+      val repository = new OrderRepository(work, tr)
       val order1 = Order(UUID.randomUUID(), Location.minLocation)
       val order2 = Order(UUID.randomUUID(), Location.minLocation)
       repository.addOrder(order1)
       repository.addOrder(order2)
+      work.apply()
 
       val orders = repository.findRandomCreatedOrder()
       orders.isDefined shouldBe true
@@ -79,13 +88,15 @@ class IOrderRepositoryTest extends PostgreSQLContextTest {
 
   "findAllAssignerOrder" in {
     withTransaction(tr => {
-      val repository = new IOrderRepository(tr)
+      val work = new UnitOfWork(tr)
+      val repository = new OrderRepository(work, tr)
       val order1 = Order(UUID.randomUUID(), Location.minLocation)
       order1.assignCourier(Courier("Kirill", "Car", 2, Location.minLocation))
       val order2 = Order(UUID.randomUUID(), Location.minLocation)
       order2.assignCourier(Courier("Andrey", "Car", 2, Location.minLocation))
       repository.addOrder(order1)
       repository.addOrder(order2)
+      work.apply()
 
       val orders = repository.findAllAssignerOrder()
       orders.size shouldBe 2
