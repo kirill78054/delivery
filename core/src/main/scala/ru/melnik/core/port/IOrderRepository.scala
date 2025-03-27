@@ -4,7 +4,7 @@ import ru.melnik.core.domain.model.orderaggregate.Order
 
 import java.util.UUID
 
-trait OrderRepository {
+trait IOrderRepository {
   def addOrder(order: Order): Unit
   def updateOrder(order: Order): Unit
   def findOrderById(orderId: UUID): Order

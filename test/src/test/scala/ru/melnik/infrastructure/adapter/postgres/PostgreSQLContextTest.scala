@@ -26,6 +26,7 @@ class PostgreSQLContextTest extends AnyWordSpec with Matchers with BeforeAndAfte
 
   override protected def beforeEach(): Unit = {
     postgreSQLContainer.start()
+    println(s"Starting test containers:\nurl = ${postgreSQLContainer.getJdbcUrl}\nuser = ${postgreSQLContainer.getUsername}\npassword = ${postgreSQLContainer.getPassword}")
     withTransaction(tr => {
       dropTables(tr)
       execFileScript("init_tables.sql", tr)

@@ -7,36 +7,38 @@ import doobie.postgres.implicits._
 import doobie.util.transactor.Transactor.Aux
 import ru.melnik.core.domain.model.orderaggregate.{Order, OrderStatus}
 import ru.melnik.core.domain.sharedkernel.Location
-import ru.melnik.core.port.OrderRepository
+import ru.melnik.core.port.IOrderRepository
 
 import java.util.UUID
 
-class IOrderRepository(tr: Aux[IO, Unit]) extends OrderRepository {
+class OrderRepository(uw: UnitOfWork, tr: Aux[IO, Unit]) extends IOrderRepository {
+  require(uw != null)
+  require(tr != null)
 
   override def addOrder(order: Order): Unit = {
-    sql"""
-      insert into delivery_order (id,location_x,location_y,order_status, courier_id)
-      values (${order.id}, ${order.location.x}, ${order.location.y}, ${order.status.name}, ${order.courierId})
-    """
-      .update
-      .run
-      .transact(tr)
-      .unsafeRunSync()
+    uw.transaction(_ => Some(
+      sql"""
+                insert into delivery_order (id,location_x,location_y,order_status, courier_id)
+                  values (${order.id}, ${order.location.x}, ${order.location.y}, ${order.status.name}, ${order.courierId})
+            """
+        .update
+        .run
+    ))
   }
 
   override def updateOrder(order: Order): Unit = {
-    sql"""
-      update delivery_order set
-      location_x = ${order.location.x}
-      , location_y = ${order.location.y}
-      , order_status = ${order.status.name}
-      , courier_id = ${order.courierId}
-      where id = ${order.id}
-    """
-      .update
-      .run
-      .transact(tr)
-      .unsafeRunSync()
+    uw.transaction(_ => Some(
+      sql"""
+              update delivery_order set
+                location_x = ${order.location.x}
+                , location_y = ${order.location.y}
+                , order_status = ${order.status.name}
+                , courier_id = ${order.courierId}
+              where id = ${order.id}
+           """
+        .update
+        .run
+    ))
   }
 
   override def findOrderById(orderId: UUID): Order = {

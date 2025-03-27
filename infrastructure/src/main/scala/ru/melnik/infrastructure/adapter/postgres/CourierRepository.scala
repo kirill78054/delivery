@@ -7,62 +7,54 @@ import doobie.postgres.implicits._
 import doobie.util.transactor.Transactor.Aux
 import ru.melnik.core.domain.model.courieraggregate.{Courier, CourierStatus, Transport}
 import ru.melnik.core.domain.sharedkernel.Location
-import ru.melnik.core.port.CourierRepository
+import ru.melnik.core.port.ICourierRepository
 
 import java.util.UUID
 
-class ICourierRepository(tr: Aux[IO, Unit]) extends CourierRepository {
+class CourierRepository(uw: UnitOfWork, tr: Aux[IO, Unit]) extends ICourierRepository {
+  require(uw != null)
+  require(tr != null)
 
   override def addCourier(courier: Courier): Unit = {
-    val insertTransport =
+    uw.transaction(_ => Some(
       sql"""
-      insert into delivery_transport (id, name, speed) values (${courier.transport.id}, ${courier.transport.name}, ${courier.transport.speed})
-    """
+            insert into delivery_transport (id, name, speed) values (${courier.transport.id}, ${courier.transport.name}, ${courier.transport.speed})
+        """
         .update
         .run
+    ))
 
-    val insertCourier =
+    uw.transaction(_ => Some(
       sql"""
-      insert into delivery_courier (id, name, transport_id, location_x, location_y, courier_status)
-      values (${courier.id}, ${courier.name}, ${courier.transport.id}, ${courier.location.x}, ${courier.location.y}, ${courier.courierStatus.name})
-    """
+            insert into delivery_courier (id, name, transport_id, location_x, location_y, courier_status)
+              values (${courier.id}, ${courier.name}, ${courier.transport.id}, ${courier.location.x}, ${courier.location.y}, ${courier.courierStatus.name})
+        """
         .update
         .run
-
-    val transaction = for {
-      _ <- insertTransport
-      _ <- insertCourier
-    } yield ()
-
-    transaction.transact(tr).unsafeRunSync()
+    ))
   }
 
   override def updateCourier(courier: Courier): Unit = {
-    val updateTransport =
+    uw.transaction(_ => Some(
       sql"""
-      update delivery_transport set name = ${courier.transport.name} , speed = ${courier.transport.speed} where id = ${courier.transport.id}
-    """
+          update delivery_transport set name = ${courier.transport.name} , speed = ${courier.transport.speed} where id = ${courier.transport.id}
+        """
         .update
         .run
+    ))
 
-    val updateCourier =
+    uw.transaction(_ => Some(
       sql"""
-      update delivery_courier set
-      name = ${courier.name}
-      , location_x = ${courier.location.x}
-      , location_y = ${courier.location.y}
-      , courier_status = ${courier.courierStatus.name}
-      where id = ${courier.id}
-    """
+          update delivery_courier set
+          name = ${courier.name}
+          , location_x = ${courier.location.x}
+          , location_y = ${courier.location.y}
+          , courier_status = ${courier.courierStatus.name}
+          where id = ${courier.id}
+        """
         .update
         .run
-
-    val transaction = for {
-      _ <- updateTransport
-      _ <- updateCourier
-    } yield ()
-
-    transaction.transact(tr).unsafeRunSync()
+    ))
   }
 
   override def findCourierById(courierId: UUID): Courier = {

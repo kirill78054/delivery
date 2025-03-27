@@ -4,7 +4,7 @@ import ru.melnik.core.domain.model.courieraggregate.Courier
 
 import java.util.UUID
 
-trait CourierRepository {
+trait ICourierRepository {
   def addCourier(courier: Courier): Unit
   def updateCourier(courier: Courier): Unit
   def findCourierById(courierId: UUID): Courier
