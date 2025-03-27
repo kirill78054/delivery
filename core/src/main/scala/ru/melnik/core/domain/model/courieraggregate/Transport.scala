@@ -40,11 +40,27 @@ object Transport {
   val SPEED_MAX: Int = 3
 
   def apply(name: String, speed: Int): Transport = {
+    Transport(
+      id = UUID.randomUUID(),
+      name = name,
+      speed = speed,
+    )
+  }
+
+  def apply(id: UUID, name: String, speed: Int): Transport = {
+    require(id != null)
     require(name != null && name.nonEmpty)
     require(speed >= SPEED_MIN && speed <= SPEED_MAX, s"speed must be between $SPEED_MIN and $SPEED_MAX, current speed: $speed")
-
     new Transport(
-      id = UUID.randomUUID(),
+      id = id,
+      name = name,
+      speed = speed,
+    )
+  }
+
+  def fromDb(id: UUID, name: String, speed: Int): Transport = {
+    Transport(
+      id = id,
       name = name,
       speed = speed,
     )

@@ -10,4 +10,12 @@
     </parent>
 
     <artifactId>infrastructure</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>ru.melnik</groupId>
+            <artifactId>core</artifactId>
+            <version>1</version>
+        </dependency>
+    </dependencies>
 </project>
